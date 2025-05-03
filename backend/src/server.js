@@ -7,6 +7,9 @@ import sql from 'mssql';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+//enable JSON body parsing for the API endpoints
+app.use(express.json());
+
 // Database configuration
 const dbConfig = {
   user: process.env.DB_USER,
@@ -61,6 +64,42 @@ const client1 = {
   location: "soweto",
   issue: "need help quitting drugs",
 };
+
+//New login endpoint
+app.post("/api/login", async (req, res) => {
+  const { councilNo, email, password } = req.body;
+
+  // Basic validation
+  if (!councilNo || !email || !password) {
+    return res
+      .status(400)
+      .json({ success: false, message: "All fields are required." });
+  }
+
+  try {
+    // In a real implementation, query user database here.
+    // For demonstration, we simulate a user based on hard-coded values.
+    if (councilNo == 12345 && email === "test@example.com" && password === "password123") {
+      const user = {
+        email,
+        name: "John",
+        surname: "Doe",
+        age: 30,
+        location: "Somewhere",
+      };
+      return res.status(200).json({ success: true, user });
+    } else {
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid credentials." });
+    }
+  } catch (error) {
+    console.error("Login error:", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Server error during login." });
+  }
+});
 
 // Start the server first
 app.listen(PORT, () => {
