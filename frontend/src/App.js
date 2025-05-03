@@ -6,8 +6,8 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Welcome to CareMind</h1>
-        <p>This is our prototype for AI-driven client-tailored recommendations.</p>
+        <h1>Welcome to CareMind.</h1>
+        <p>Bridging the gap between data-driven decision-making and compassionate care</p>
       </header>
     </div>
   );
