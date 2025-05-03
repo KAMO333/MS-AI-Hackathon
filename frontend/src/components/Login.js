@@ -37,7 +37,7 @@ const Login = ({ onLogin }) => {
             <input
               type="council no."
               id="council no."
-              value={email}
+              value={councilNo}
               onChange={(e) => setCouncilNo(e.target.value)}
               placeholder="Enter your council no."
               required
