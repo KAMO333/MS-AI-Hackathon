@@ -67,19 +67,33 @@ const client1 = {
 
 //New login endpoint
 app.post("/api/login", async (req, res) => {
-  const { councilNo, email, password } = req.body;
+  let { councilNo, email, password } = req.body;
 
   // Basic validation
-  if (!councilNo || !email || !password) {
-    return res
-      .status(400)
-      .json({ success: false, message: "All fields are required." });
+  if (!councilNo || !email || !password == undefined) {
+    return res.status(400).json({ 
+      success: false,
+      message: "All fields are required."
+    });
+  }
+
+  // Convert councilNo to a number if necessary
+  if (typeof councilNo === "string") {
+    councilNo = parseInt(councilNo, 10);
+  }
+
+  // Check if the conversion was successful
+  if (isNaN(councilNo)) {
+    return res.status(400).json({ 
+      success: false, 
+      message: "Council number must be a valid number." 
+    });
   }
 
   try {
     // In a real implementation, query user database here.
     // For demonstration, we simulate a user based on hard-coded values.
-    if (councilNo == "12345" && email === "test@example.com" && password === "password123") {
+    if (councilNo == 12345 && email === "test@example.com" && password === "password123") {
       const user = {
         councilNo,
         email,

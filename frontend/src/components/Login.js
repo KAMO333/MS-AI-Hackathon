@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 
 const Login = ({ onLogin }) => {
     // State variables for the form fields and error messages
@@ -16,14 +17,30 @@ const Login = ({ onLogin }) => {
             return;
         }
 
+        const councilNoInt = parseInt(councilNo, 10);
+        if (isNaN(councilNoInt)) {
+          setError('Council number must be a valid number.');
+          return;
+        }
+
         setError('');
 
-        const loginPayload = {councilNo, email, password};
-
         try {
-            onLogin(loginPayload);
+          //make API call to the login endpoint
+          const response = await axios.post('/api/login', {
+            councilNo: councilNoInt,
+            email,
+            password,
+          });
+
+          if (response.data.success) {
+            onLogin(response.data.user);
+          } else {
+            setError(response.data.message || 'Login failed. Please provide valid credetials.');
+          }
         } catch (err) {
-            setError('Login failed. Please provide correct credetials');
+          console.error('Login API call error:', err.response ? err.response.data : err.message);
+          setError('A network error occurred. Please try again later.');
         }
     };
 
@@ -35,11 +52,11 @@ const Login = ({ onLogin }) => {
         <div>
             <label htmlFor="council no.">Council No:</label><br />
             <input
-              type="council no."
+              type="number"
               id="council no."
               value={councilNo}
               onChange={(e) => setCouncilNo(e.target.value)}
-              placeholder="Enter your council no."
+              placeholder="Enter your council number"
               required
             />
           </div>
