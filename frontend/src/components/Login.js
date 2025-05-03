@@ -33,7 +33,7 @@ const Login = ({ onLogin }) => {
         {error && <p className="error">{error}</p>}
         <form onSubmit={handleSubmit}>
         <div>
-            <label htmlFor="council no.">CouncilNo:</label><br />
+            <label htmlFor="council no.">Council No:</label><br />
             <input
               type="council no."
               id="council no."
