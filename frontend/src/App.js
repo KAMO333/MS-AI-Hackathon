@@ -1,14 +1,19 @@
 //Main component for app's UI
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import Login from './components/Login';
+import Dashboard from './components/Dashboard'; // Assuming you'll build this later
 
 function App() {
+  const [user, setUser] = useState(null);
+
+  // Callback for when login is complete
+  const handleLogin = (userData) => {
+    setUser(userData);
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <h1>Welcome to CareMind.</h1>
-        <p>Bridging the gap between data-driven decision-making and compassionate care</p>
-      </header>
+      {user ? <Dashboard user={user} /> : <Login onLogin={handleLogin} />}
     </div>
   );
 }
