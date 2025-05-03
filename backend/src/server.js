@@ -79,7 +79,7 @@ app.post("/api/login", async (req, res) => {
   try {
     // In a real implementation, query user database here.
     // For demonstration, we simulate a user based on hard-coded values.
-    if (councilNo == 12345 && email === "test@example.com" && password === "password123") {
+    if (councilNo == "12345" && email === "test@example.com" && password === "password123") {
       const user = {
         email,
         name: "John",
