@@ -2,9 +2,48 @@ import express from "express";
 import "dotenv/config";
 import OpenAI from "openai";
 import readline from "readline/promises";
+import sql from 'mssql';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Database configuration
+const dbConfig = {
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  server: process.env.DB_SERVER,
+  database: process.env.DB_DATABASE,
+  options: {
+    encrypt: true,
+    trustServerCertificate: false
+  }
+};
+
+// Function to store client data in database
+async function storeClientData(clientData) {
+  try {
+    const pool = await sql.connect(dbConfig);
+    const result = await pool.request()
+      .input('name', sql.NVarChar, clientData.name)
+      .input('surname', sql.NVarChar, clientData.surname)
+      .input('age', sql.Int, clientData.age)
+      .input('location', sql.NVarChar, clientData.location)
+      .input('issue', sql.NVarChar, clientData.issue)
+      .input('response', sql.NVarChar, clientData.response)
+      .query(`
+        INSERT INTO Clients (name, surname, age, location, issue, response)
+        VALUES (@name, @surname, @age, @location, @issue, @response)
+      `);
+    
+    console.log('Client data stored successfully');
+    return result;
+  } catch (err) {
+    console.error('Error storing client data:', err);
+    throw err;
+  } finally {
+    sql.close();
+  }
+}
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -57,8 +96,16 @@ async function startAIInteraction() {
       ],
     });
 
+    const aiResponse = response.choices[0].message.content;
+    
+    // Add the response to client1 object
+    client1.response = aiResponse;
+
+    // Store client data in database with the response
+    await storeClientData(client1);
+
     console.log("\nAI Response:");
-    console.log(response.choices[0].message.content);
+    console.log(aiResponse);
 
     rl.close();
     process.exit(0); // Exit after completion
