@@ -1,6 +1,7 @@
 import express from "express";
 import "dotenv/config";
 import OpenAI from "openai";
+import readline from "readline/promises";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -9,21 +10,56 @@ const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-async function main() {
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
+
+const client1 = {
+  name: "kamogelo",
+  surname: "xxx",
+  age: 25,
+  location: "soweto",
+  issue: "need help quitting drugs",
+};
+
+// Start the server first
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+  // Then start the AI interaction
+  startAIInteraction();
+});
+
+async function startAIInteraction() {
   try {
+    // Get single user input
+    const userMessage = await rl.question("Your message to AI: ");
+
+    // Create raw combined message
+    const fullMessage = `
+    Client Data: 
+    ${JSON.stringify(client1, null, 2)}
+    
+    Message: ${userMessage}
+    `;
+
     const response = await client.chat.completions.create({
       model: "gpt-4",
-      messages: [{ role: "user", content: "say hello in tsonga" }],
+      messages: [
+        {
+          role: "user",
+          content: fullMessage,
+        },
+      ],
     });
 
+    console.log("\nAI Response:");
     console.log(response.choices[0].message.content);
+
+    rl.close();
+    process.exit(0); // Exit after completion
   } catch (error) {
-    console.error("OpenAI API error:", error);
+    console.error("Error:", error);
+    process.exit(1);
   }
-
-  app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-  });
 }
-
-main();
