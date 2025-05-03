@@ -81,6 +81,7 @@ app.post("/api/login", async (req, res) => {
     // For demonstration, we simulate a user based on hard-coded values.
     if (councilNo == "12345" && email === "test@example.com" && password === "password123") {
       const user = {
+        councilNo,
         email,
         name: "John",
         surname: "Doe",
