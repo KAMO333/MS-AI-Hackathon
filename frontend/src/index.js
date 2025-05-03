@@ -1,3 +1,5 @@
+//Responsible for entry point for React application
+//Rendering root component into DOM
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
