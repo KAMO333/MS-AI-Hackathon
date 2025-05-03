@@ -44,8 +44,12 @@ async function startAIInteraction() {
     `;
 
     const response = await client.chat.completions.create({
-      model: "gpt-4",
+      model: "gpt-3.5-turbo",
       messages: [
+        {
+          role: "system",
+          content: "You are a professional Social Worker assistant. Your role is to help social workers by providing advice, support, and guidance for their clients. You should be empathetic, professional, and focus on evidence-based interventions while maintaining a supportive and non-judgmental approach. Consider the client's background information when providing responses."
+        },
         {
           role: "user",
           content: fullMessage,
