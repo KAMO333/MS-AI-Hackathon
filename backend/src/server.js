@@ -1,3 +1,5 @@
+console.log("OPENAI_API_KEY:", process.env.OPENAI_API_KEY);
+
 import express from "express";
 import "dotenv/config";
 import OpenAI from "openai";
