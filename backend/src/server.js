@@ -1,10 +1,13 @@
 import express from "express";
 import "dotenv/config";
 import OpenAI from "openai";
-import readline from "readline/promises";
 import sql from 'mssql';
+import cors from 'cors';
 
 const app = express();
+app.use(cors());
+app.use(express.json());
+
 const PORT = process.env.PORT || 3000;
 
 // Database configuration
@@ -49,74 +52,14 @@ const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
-
-// Function to find client by name
-async function findClientByName(name) {
+app.post('/api/consultation', async (req, res) => {
   try {
-    const pool = await sql.connect(dbConfig);
-    const result = await pool.request()
-      .input('name', sql.NVarChar, name)
-      .query('SELECT * FROM Clients WHERE name = @name');
+    const { clientData, observation } = req.body;
     
-    return result.recordset[0]; // Return first matching client or undefined
-  } catch (err) {
-    console.error('Error finding client:', err);
-    throw err;
-  } finally {
-    sql.close();
-  }
-}
-
-// Function to get client information from user
-async function getClientInfo() {
-  const name = await rl.question("Enter client name: ");
-  const existingClient = await findClientByName(name);
-  
-  if (existingClient) {
-    console.log("Client found in database!");
-    return existingClient;
-  }
-  
-  console.log("New client! Please enter client details:");
-  const newClient = {
-    name: name,
-    surname: await rl.question("Enter surname: "),
-    age: parseInt(await rl.question("Enter age: ")),
-    location: await rl.question("Enter location: "),
-    issue: await rl.question("Enter issue: ")
-  };
-  
-  return newClient;
-}
-
-const client1 = {
-  name: "kamogelo",
-  surname: "xxx",
-  age: 25,
-  location: "soweto",
-  issue: "need help quitting drugs",
-};
-
-// Start the server first
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-  // Then start the AI interaction
-  startAIInteraction();
-});
-
-async function startAIInteraction() {
-  try {
-    // Get client information
-    const clientData = await getClientInfo();
+    // Check for existing client
+    const existingClient = await findClientByName(clientData.name, clientData.surname);
     
-    // Get social worker's observation/concern
-    const userMessage = await rl.question("Please describe your observation or concern about the client: ");
-
-    // Create a more structured message for the AI
+    // Create message for AI
     const fullMessage = `
     Client Background:
     - Name: ${clientData.name}
@@ -124,7 +67,7 @@ async function startAIInteraction() {
     - Location: ${clientData.location}
     - Current Issue: ${clientData.issue}
     
-    Social Worker's Observation/Concern: ${userMessage}
+    Social Worker's Observation/Concern: ${observation}
     
     Please provide professional guidance and support recommendations for this client, considering their background and current situation.`;
 
@@ -144,21 +87,21 @@ async function startAIInteraction() {
 
     const aiResponse = response.choices[0].message.content;
     
-    // Add the response to clientData object
-    clientData.response = aiResponse;
-
-    // Only store if it's a new client
-    if (!clientData.id) {
-      await storeClientData(clientData);
+    // Store new client data
+    if (!existingClient) {
+      await storeClientData({
+        ...clientData,
+        response: aiResponse
+      });
     }
 
-    console.log("\nSuggested plan of action:");
-    console.log(aiResponse);
-
-    rl.close();
-    process.exit(0); // Exit after completion
+    res.json({ response: aiResponse });
   } catch (error) {
-    console.error("Error:", error);
-    process.exit(1);
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
-}
+});
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
