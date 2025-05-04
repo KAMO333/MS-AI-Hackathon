@@ -1,4 +1,6 @@
-/* Global styles */
+/* src/App.css */
+
+/* Global Styles */
 body {
   margin: 0;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -7,60 +9,94 @@ body {
   color: black;
 }
 
-/* Center the application contents */
+/* Main App Container (if used) */
 .App {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  /* Optional: also fade in the overall container if desired */
   animation: fadeIn 2s ease-in-out;
 }
 
-/* The login container styling */
-.login-container {
+/* Fade In Animation for overall container */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Common container styles for forms and content panels */
+.container {
   background: white;
   padding: 2rem;
   border-radius: 8px;
-  /* A subtle box shadow for depth */
   box-shadow: 0 4px 12px rgba(10, 77, 63, 0.2);
+  border: 2px solid #0A4D3F; /* phthalo green accent */
+  margin: 1rem auto;
+}
+
+/* Login Component Styling */
+.login-container {
   width: 350px;
-  /* Accent with phthalo green, a deep, bold green */
+  animation: fadeInContent 1.5s ease-in-out forwards;
+}
+
+/* Dashboard Component Styling */
+.dashboard-container {
+  background: white;
+  padding: 2rem;
   border: 2px solid #0A4D3F;
-  /* Start hidden and then fade in */
-  opacity: 0;
-  animation: fadeInContent 2s ease-in-out forwards;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(10, 77, 63, 0.2);
+  max-width: 500px;
+  margin: 2rem auto;
 }
 
-/* Fade in content keyframes */
+/* Consultation Component Styling */
+.consultation-container {
+  background: white;
+  padding: 2rem;
+  border: 2px solid #0A4D3F;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(10, 77, 63, 0.2);
+  max-width: 600px;
+  margin: 2rem auto;
+}
+
+/* Fade In Animation for Containers */
 @keyframes fadeInContent {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* General styles for text and labels */
-.login-container h2 {
+/* Heading Styles */
+h2, h3, h4 {
   text-align: center;
-  color: black;
+  margin-bottom: 1rem;
 }
 
-.login-container label {
-  font-weight: bold;
-  color: black;
-}
-
-/* Styling the input fields */
-.login-container input {
+/* Input & Textarea Styles */
+input[type="text"],
+input[type="email"],
+input[type="number"],
+input[type="password"],
+textarea {
   width: 100%;
   padding: 0.5rem;
   margin-top: 0.25rem;
   margin-bottom: 1rem;
   border: 1px solid #ccc;
   border-radius: 4px;
+  font-size: 1rem;
 }
 
-/* Styling the button */
-.login-container button {
+/* Button Styles */
+button {
   width: 100%;
   padding: 0.75rem;
   background-color: #0A4D3F; /* phthalo green */
@@ -72,11 +108,16 @@ body {
   transition: background-color 0.3s ease;
 }
 
-.login-container button:hover {
-  background-color: #075d33; /* Slightly lighter phthalo green */
+button:hover {
+  background-color: #075d33; /* a slightly lighter shade */
 }
 
-/* Error message styling */
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Error Message Styling */
 .error {
   background-color: #f8d7da;
   color: #842029;
@@ -84,10 +125,17 @@ body {
   margin-bottom: 1rem;
   border: 1px solid #f5c2c7;
   border-radius: 4px;
+  text-align: center;
 }
 
-/* Optional: fade in the entire app container */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+/* Optional: Label Styling */
+label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+/* Allow textareas to be resized vertically */
+textarea {
+  resize: vertical;
 }

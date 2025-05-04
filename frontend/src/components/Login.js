@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const Login = ({ onLogin }) =>{
+const Login = ({ onLogin }) => {
   // State variables for the form fields and error messages
   const [councilNo, setCouncilNo] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  //Handler for form submission
+  // Handler for form submission
   const handleSubmit = async (e) => {
-    e.preventDefault(); //Prevent the default form submission
+    e.preventDefault(); // Prevent the default form submission
 
     if (!councilNo || !email || !password) {
       setError('Please fill in all fields.');
@@ -26,7 +26,7 @@ const Login = ({ onLogin }) =>{
     setError('');
 
     try {
-      //make API call to the login endpoint
+      // Make API call to the login endpoint
       const response = await axios.post('/api/login', {
         councilNo: councilNoInt,
         email,
@@ -36,7 +36,7 @@ const Login = ({ onLogin }) =>{
       if (response.data.success) {
         onLogin(response.data.user);
       } else {
-        setError(response.data.message || 'Login failed. Please provide valid credetials.');
+        setError(response.data.message || 'Login failed. Please provide valid credentials.');
       }
     } catch (err) {
       console.error('Login API call error:', err.response ? err.response.data : err.message);
@@ -50,42 +50,48 @@ const Login = ({ onLogin }) =>{
       {error && <p className="error">{error}</p>}
       <form onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="council no.">Council No:</label><br />
+          <label htmlFor="councilNo">Council No:</label>
+          <br />
           <input
             type="number"
-            id="council no."
+            id="councilNo"
             value={councilNo}
             onChange={(e) => setCouncilNo(e.target.value)}
             placeholder="Enter your council number"
-            required />
+            required
+          />
         </div>
         <br />
         <div>
-          <label htmlFor="email">Email:</label><br />
+          <label htmlFor="email">Email:</label>
+          <br />
           <input
             type="email"
             id="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter your email address"
-            required />
+            required
+          />
         </div>
         <br />
         <div>
-          <label htmlFor="password">Password:</label><br />
+          <label htmlFor="password">Password:</label>
+          <br />
           <input
             type="password"
             id="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Enter your password"
-            required />
+            required
+          />
         </div>
         <br />
         <button type="submit">Login</button>
       </form>
     </div>
   );
-}
+};
 
 export default Login;
