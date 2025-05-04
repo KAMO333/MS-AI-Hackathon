@@ -1,6 +1,6 @@
 //Main component for app's UI
 import './App.css';
-import React from 'react';
+import React, { useState } from 'react';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard'; // Assuming you'll build this later
 
