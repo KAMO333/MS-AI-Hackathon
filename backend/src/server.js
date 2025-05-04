@@ -1,10 +1,13 @@
 import express from "express";
 import "dotenv/config";
 import OpenAI from "openai";
-import readline from "readline/promises";
 import sql from 'mssql';
+import cors from 'cors';
 
 const app = express();
+app.use(cors());
+app.use(express.json());
+
 const PORT = process.env.PORT || 3000;
 
 //enable JSON body parsing for the API endpoints
@@ -52,89 +55,24 @@ const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
-
-const client1 = {
-  name: "kamogelo",
-  surname: "xxx",
-  age: 25,
-  location: "soweto",
-  issue: "need help quitting drugs",
-};
-
-//New login endpoint
-app.post("/api/login", async (req, res) => {
-  let { councilNo, email, password } = req.body;
-
-  // Basic validation
-  if (!councilNo || !email || !password == undefined) {
-    return res.status(400).json({ 
-      success: false,
-      message: "All fields are required."
-    });
-  }
-
-  // Convert councilNo to a number if necessary
-  if (typeof councilNo === "string") {
-    councilNo = parseInt(councilNo, 10);
-  }
-
-  // Check if the conversion was successful
-  if (isNaN(councilNo)) {
-    return res.status(400).json({ 
-      success: false, 
-      message: "Council number must be a valid number." 
-    });
-  }
-
+app.post('/api/consultation', async (req, res) => {
   try {
-    // In a real implementation, query user database here.
-    // For demonstration, we simulate a user based on hard-coded values.
-    if (councilNo == 12345 && email === "test@example.com" && password === "password123") {
-      const user = {
-        councilNo,
-        email,
-        name: "John",
-        surname: "Doe",
-        age: 30,
-        location: "Somewhere",
-      };
-      return res.status(200).json({ success: true, user });
-    } else {
-      return res
-        .status(401)
-        .json({ success: false, message: "Invalid credentials." });
-    }
-  } catch (error) {
-    console.error("Login error:", error);
-    return res
-      .status(500)
-      .json({ success: false, message: "Server error during login." });
-  }
-});
-
-// Start the server first
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-  // Then start the AI interaction
-  startAIInteraction();
-});
-
-async function startAIInteraction() {
-  try {
-    // Get single user input
-    const userMessage = await rl.question("Your message to AI: ");
-
-    // Create raw combined message
-    const fullMessage = `
-    Client Data: 
-    ${JSON.stringify(client1, null, 2)}
+    const { clientData, observation } = req.body;
     
-    Message: ${userMessage}
-    `;
+    // Check for existing client
+    const existingClient = await findClientByName(clientData.name, clientData.surname);
+    
+    // Create message for AI
+    const fullMessage = `
+    Client Background:
+    - Name: ${clientData.name}
+    - Age: ${clientData.age}
+    - Location: ${clientData.location}
+    - Current Issue: ${clientData.issue}
+    
+    Social Worker's Observation/Concern: ${observation}
+    
+    Please provide professional guidance and support recommendations for this client, considering their background and current situation.`;
 
     const response = await client.chat.completions.create({
       model: "gpt-3.5-turbo",
@@ -152,19 +90,21 @@ async function startAIInteraction() {
 
     const aiResponse = response.choices[0].message.content;
     
-    // Add the response to client1 object
-    client1.response = aiResponse;
+    // Store new client data
+    if (!existingClient) {
+      await storeClientData({
+        ...clientData,
+        response: aiResponse
+      });
+    }
 
-    // Store client data in database with the response
-    await storeClientData(client1);
-
-    console.log("\nAI Response:");
-    console.log(aiResponse);
-
-    rl.close();
-    process.exit(0); // Exit after completion
+    res.json({ response: aiResponse });
   } catch (error) {
-    console.error("Error:", error);
-    process.exit(1);
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
-}
+});
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
