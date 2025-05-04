@@ -3,7 +3,8 @@
 A full-stack application that helps social workers manage client information and get AI-powered assistance, with proper client data integration.
 
 ![Project Status](https://img.shields.io/badge/status-active-success)
-![Tech Stack](https://img.shields.io/badge/stack-Node.js%20%7C%20Express%20%7C%20OpenAI%20%7C%20MSSQL-blue)
+![Tech Stack](https://img.shields.io/badge/stack-HTML5%20%7C%20CSS3%20%7C%20JavaScript%20%7C%20Node.js%20%7C%20Express%20%7C%20OpenAI%20%7C%20MSSQL-blue)
+
 
 ## 📁 Project Structure
 
