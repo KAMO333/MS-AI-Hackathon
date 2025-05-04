@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static("../frontend")); // Serve frontend files
+app.use(express.static("../frontend"));
 
 // Database configuration
 const dbConfig = {
@@ -29,15 +29,6 @@ const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Client data
-const client1 = {
-  name: "John",
-  surname: "Doe",
-  age: 45,
-  location: "Rosebank",
-  issue: "Depression",
-};
-
 // Function to store client data in database
 async function storeClientData(clientData) {
   let pool;
@@ -54,7 +45,6 @@ async function storeClientData(clientData) {
         INSERT INTO Clients (name, surname, age, location, issue, response)
         VALUES (@name, @surname, @age, @location, @issue, @response)
       `);
-
     console.log("Client data stored successfully");
     return result;
   } catch (err) {
@@ -69,13 +59,30 @@ async function storeClientData(clientData) {
 
 // API endpoint to get client data
 app.get("/api/client", (req, res) => {
-  res.json(client1);
+  res.json({
+    name: "John",
+    surname: "Doe",
+    age: 45,
+    location: "Rosebank",
+    issue: "Depression",
+  });
 });
 
 // API endpoint to send message to AI
 app.post("/api/send-to-ai", async (req, res) => {
   try {
-    const { message } = req.body;
+    const { message, clientData } = req.body;
+
+    const fullMessage = `
+    Client Information:
+    Name: ${clientData.name} ${clientData.surname}
+    Age: ${clientData.age}
+    Location: ${clientData.location}
+    Primary Issue: ${clientData.issue}
+    
+    Social Worker's Message:
+    ${message}
+    `;
 
     const response = await client.chat.completions.create({
       model: "gpt-3.5-turbo",
@@ -83,25 +90,25 @@ app.post("/api/send-to-ai", async (req, res) => {
         {
           role: "system",
           content:
-            "You are a professional Social Worker assistant. Your role is to help social workers by providing advice, support, and guidance for their clients. You should be empathetic, professional, and focus on evidence-based interventions while maintaining a supportive and non-judgmental approach. Consider the client's background information when providing responses.",
+            "You are a professional Social Worker assistant. Your role is to help social workers by providing advice, support, and guidance for their clients. Consider the client's background information when providing responses.",
         },
         {
           role: "user",
-          content: message,
+          content: fullMessage,
         },
       ],
     });
 
     const aiResponse = response.choices[0].message.content;
-    client1.response = aiResponse;
 
-    // Store client data in database with the response
-    await storeClientData(client1);
+    await storeClientData({
+      ...clientData,
+      response: aiResponse,
+    });
 
     res.json({
       success: true,
       response: aiResponse,
-      clientData: client1,
     });
   } catch (error) {
     console.error("Error:", error);
