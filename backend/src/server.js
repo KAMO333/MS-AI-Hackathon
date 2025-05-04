@@ -1,10 +1,8 @@
-console.log("OPENAI_API_KEY:", process.env.OPENAI_API_KEY);
-
 import express from "express";
 import "dotenv/config";
 import OpenAI from "openai";
-import sql from 'mssql';
-import cors from 'cors';
+import sql from "mssql";
+import cors from "cors";
 
 const app = express();
 app.use(cors());
@@ -12,10 +10,7 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
 
-//enable JSON body parsing for the API endpoints
-app.use(express.json());
-
-// Database configuration
+// Database configuration (ensure these variables are set in your .env file if used)
 const dbConfig = {
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
@@ -23,65 +18,76 @@ const dbConfig = {
   database: process.env.DB_DATABASE,
   options: {
     encrypt: true,
-    trustServerCertificate: false
-  }
+    trustServerCertificate: false,
+  },
 };
 
-// Function to store client data in database
+// Function to store client data in the database
 async function storeClientData(clientData) {
   try {
     const pool = await sql.connect(dbConfig);
-    const result = await pool.request()
-      .input('name', sql.NVarChar, clientData.name)
-      .input('surname', sql.NVarChar, clientData.surname)
-      .input('age', sql.Int, clientData.age)
-      .input('location', sql.NVarChar, clientData.location)
-      .input('issue', sql.NVarChar, clientData.issue)
-      .input('response', sql.NVarChar, clientData.response)
+    const result = await pool
+      .request()
+      .input("name", sql.NVarChar, clientData.name)
+      .input("surname", sql.NVarChar, clientData.surname)
+      .input("age", sql.Int, clientData.age)
+      .input("location", sql.NVarChar, clientData.location)
+      .input("issue", sql.NVarChar, clientData.issue)
+      .input("response", sql.NVarChar, clientData.response)
       .query(`
         INSERT INTO Clients (name, surname, age, location, issue, response)
         VALUES (@name, @surname, @age, @location, @issue, @response)
       `);
-    
-    console.log('Client data stored successfully');
+
+    console.log("Client data stored successfully");
     return result;
   } catch (err) {
-    console.error('Error storing client data:', err);
+    console.error("Error storing client data:", err);
     throw err;
   } finally {
     sql.close();
   }
 }
 
+// Stub for findClientByName – replace with your lookup logic if needed.
+async function findClientByName(name, surname) {
+  // For now, we'll assume the client does not exist.
+  return null;
+}
+
+// Initialize OpenAI client using the API key from .env
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-app.post('/api/consultation', async (req, res) => {
+// Consultation endpoint
+app.post("/api/consultation", async (req, res) => {
   try {
     const { clientData, observation } = req.body;
-    
-    // Check for existing client
-    const existingClient = await findClientByName(clientData.name, clientData.surname);
-    
-    // Create message for AI
-    const fullMessage = `
-    Client Background:
-    - Name: ${clientData.name}
-    - Age: ${clientData.age}
-    - Location: ${clientData.location}
-    - Current Issue: ${clientData.issue}
-    
-    Social Worker's Observation/Concern: ${observation}
-    
-    Please provide professional guidance and support recommendations for this client, considering their background and current situation.`;
 
+    // Optional: Check for an existing client. Replace this logic with your own if necessary.
+    const existingClient = await findClientByName(clientData.name, clientData.surname);
+
+    // Build a message for the AI using client data and observation
+    const fullMessage = `
+Client Background:
+- Name: ${clientData.name}
+- Age: ${clientData.age}
+- Location: ${clientData.location}
+- Current Issue: ${clientData.issue}
+
+Social Worker's Observation/Concern: ${observation}
+
+Please provide professional guidance and support recommendations for this client, considering their background and current situation.`;
+
+    // Generate a response using OpenAI's Chat Completion endpoint
     const response = await client.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [
         {
           role: "system",
-          content: "You are a professional Social Worker assistant. Your role is to help social workers by providing advice, support, and guidance for their clients. You should be empathetic, professional, and focus on evidence-based interventions while maintaining a supportive and non-judgmental approach. Consider the client's background information when providing responses."
+          content:
+            "You are a professional Social Worker assistant. Your role is to help social workers by providing advice, support, and guidance for their clients. You should be empathetic, professional, and focus on evidence-based interventions while maintaining a supportive and non-judgmental approach. Consider the client's background information when providing responses.",
         },
         {
           role: "user",
@@ -91,19 +97,19 @@ app.post('/api/consultation', async (req, res) => {
     });
 
     const aiResponse = response.choices[0].message.content;
-    
-    // Store new client data
+
+    // If the client does not already exist, store their data along with the AI response
     if (!existingClient) {
       await storeClientData({
         ...clientData,
-        response: aiResponse
+        response: aiResponse,
       });
     }
 
     res.json({ response: aiResponse });
   } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
