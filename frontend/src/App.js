@@ -2,7 +2,7 @@
 import './App.css';
 import React, { useState } from 'react';
 import Login from './components/Login';
-import Dashboard from './components/Dashboard'; // Assuming you'll build this later
+import Consultation from './components/Consultation'; // Assuming you'll build this later
 
 function App() {
   const [user, setUser] = useState(null);
