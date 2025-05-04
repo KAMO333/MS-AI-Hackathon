@@ -1,26 +1,28 @@
+// src/components/Consultation.js
 import React, { useState } from 'react';
 import axios from 'axios';
 
 const Consultation = ({ user }) => {
-  // Form state for client data
+  // Client information state
   const [clientName, setClientName] = useState('');
   const [clientSurname, setClientSurname] = useState('');
   const [clientAge, setClientAge] = useState('');
   const [clientLocation, setClientLocation] = useState('');
   const [clientIssue, setClientIssue] = useState('');
-  // State for the social worker's observation
+  
+  // Social worker observation
   const [observation, setObservation] = useState('');
   
-  // State for API response and status
+  // API response and status states
   const [recommendation, setRecommendation] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Handler for form submission
+  // Handle form submission to fetch AI recommendation
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Basic validation: ensure all fields are filled
+    // Validate that all fields are provided
     if (
       !clientName ||
       !clientSurname ||
@@ -32,16 +34,18 @@ const Consultation = ({ user }) => {
       setError('Please fill in all fields.');
       return;
     }
-    setError('');
-    
-    // Convert age to an integer. If conversion fails, halt submission.
+
+    // Ensure age is a valid number
     const ageInt = parseInt(clientAge, 10);
     if (isNaN(ageInt)) {
       setError('Client age must be a valid number.');
       return;
     }
 
-    // Prepare clientData payload
+    setError('');
+    setLoading(true);
+
+    // Prepare clientData object as expected by the server
     const clientData = {
       name: clientName,
       surname: clientSurname,
@@ -50,15 +54,10 @@ const Consultation = ({ user }) => {
       issue: clientIssue,
     };
 
-    setLoading(true);
     try {
-      // POST the consultation data to your backend
-      const response = await axios.post('/api/consultation', {
-        clientData,
-        observation,
-      });
-      
-      // The server returns the AI's recommendation in the 'response' field.
+      // POST request to the /api/consultation endpoint
+      const response = await axios.post('/api/consultation', { clientData, observation });
+      // Set the recommendation returned from the server
       setRecommendation(response.data.response);
     } catch (err) {
       console.error(
@@ -75,6 +74,7 @@ const Consultation = ({ user }) => {
     <div className="consultation-container">
       <h2>Welcome, {user.name}!</h2>
       <p>Your registered email: {user.email}</p>
+      
       <form onSubmit={handleSubmit}>
         <h3>Client Information</h3>
         <input
@@ -123,6 +123,7 @@ const Consultation = ({ user }) => {
           {loading ? 'Loading...' : 'Submit Consultation'}
         </button>
       </form>
+      
       {recommendation && (
         <div className="recommendation-area">
           <h4>AI's Recommendation:</h4>
