@@ -10,7 +10,7 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
 
-// Database configuration (ensure these variables are set in your .env file if used)
+// Database configuration
 const dbConfig = {
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
@@ -26,8 +26,7 @@ const dbConfig = {
 async function storeClientData(clientData) {
   try {
     const pool = await sql.connect(dbConfig);
-    const result = await pool
-      .request()
+    const result = await pool.request()
       .input("name", sql.NVarChar, clientData.name)
       .input("surname", sql.NVarChar, clientData.surname)
       .input("age", sql.Int, clientData.age)
@@ -58,6 +57,11 @@ async function findClientByName(name, surname) {
 // Initialize OpenAI client using the API key from .env
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
+});
+
+// Root route for testing server connectivity
+app.get("/", (req, res) => {
+  res.send("Welcome to the CareMind API!");
 });
 
 // Consultation endpoint
