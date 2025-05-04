@@ -54,6 +54,45 @@ const rl = readline.createInterface({
   output: process.stdout,
 });
 
+// Function to find client by name
+async function findClientByName(name) {
+  try {
+    const pool = await sql.connect(dbConfig);
+    const result = await pool.request()
+      .input('name', sql.NVarChar, name)
+      .query('SELECT * FROM Clients WHERE name = @name');
+    
+    return result.recordset[0]; // Return first matching client or undefined
+  } catch (err) {
+    console.error('Error finding client:', err);
+    throw err;
+  } finally {
+    sql.close();
+  }
+}
+
+// Function to get client information from user
+async function getClientInfo() {
+  const name = await rl.question("Enter client name: ");
+  const existingClient = await findClientByName(name);
+  
+  if (existingClient) {
+    console.log("Client found in database!");
+    return existingClient;
+  }
+  
+  console.log("New client! Please enter client details:");
+  const newClient = {
+    name: name,
+    surname: await rl.question("Enter surname: "),
+    age: parseInt(await rl.question("Enter age: ")),
+    location: await rl.question("Enter location: "),
+    issue: await rl.question("Enter issue: ")
+  };
+  
+  return newClient;
+}
+
 const client1 = {
   name: "kamogelo",
   surname: "xxx",
@@ -71,16 +110,23 @@ app.listen(PORT, () => {
 
 async function startAIInteraction() {
   try {
-    // Get single user input
-    const userMessage = await rl.question("Your message to AI: ");
-
-    // Create raw combined message
-    const fullMessage = `
-    Client Data: 
-    ${JSON.stringify(client1, null, 2)}
+    // Get client information
+    const clientData = await getClientInfo();
     
-    Message: ${userMessage}
-    `;
+    // Get social worker's observation/concern
+    const userMessage = await rl.question("Please describe your observation or concern about the client: ");
+
+    // Create a more structured message for the AI
+    const fullMessage = `
+    Client Background:
+    - Name: ${clientData.name}
+    - Age: ${clientData.age}
+    - Location: ${clientData.location}
+    - Current Issue: ${clientData.issue}
+    
+    Social Worker's Observation/Concern: ${userMessage}
+    
+    Please provide professional guidance and support recommendations for this client, considering their background and current situation.`;
 
     const response = await client.chat.completions.create({
       model: "gpt-3.5-turbo",
@@ -98,13 +144,15 @@ async function startAIInteraction() {
 
     const aiResponse = response.choices[0].message.content;
     
-    // Add the response to client1 object
-    client1.response = aiResponse;
+    // Add the response to clientData object
+    clientData.response = aiResponse;
 
-    // Store client data in database with the response
-    await storeClientData(client1);
+    // Only store if it's a new client
+    if (!clientData.id) {
+      await storeClientData(clientData);
+    }
 
-    console.log("\nAI Response:");
+    console.log("\nSuggested plan of action:");
     console.log(aiResponse);
 
     rl.close();
