@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Social Worker Assistant</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Social Worker Assistant</h1>
+
+      <div class="client-info">
+        <h2>Client Information</h2>
+        <div id="client-data">
+          <!-- Client data will be populated by JavaScript -->
+        </div>
+      </div>
+
+      <div class="message-section">
+        <h2>Send Message to AI</h2>
+        <textarea
+          id="user-message"
+          placeholder="Enter your message to the AI assistant..."
+        ></textarea>
+        <button id="send-button">Send to AI</button>
+      </div>
+
+      <div class="response-section">
+        <h2>AI Response</h2>
+        <div id="ai-response">
+          <!-- AI response will appear here -->
+          <p>No response yet. Send a message to get started.</p>
+        </div>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
