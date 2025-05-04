@@ -1,38 +1,33 @@
-// Client data (will be populated from backend)
 let client1 = {};
 
-// Display client data on page load
+// Fetch and display client data on page load
 document.addEventListener("DOMContentLoaded", async function () {
-  await fetchClientData();
-  displayClientData();
+  try {
+    const response = await fetch("/api/client");
+    if (!response.ok) throw new Error("Failed to load client data");
+    client1 = await response.json();
+    displayClientData();
+  } catch (error) {
+    console.error("Error loading client data:", error);
+    document.getElementById(
+      "client-data"
+    ).innerHTML = `<p class="error">Error loading client data: ${error.message}</p>`;
+  }
 
-  // Set up event listener for send button
   document
     .getElementById("send-button")
     .addEventListener("click", sendMessageToAI);
 });
 
-async function fetchClientData() {
-  try {
-    const response = await fetch("/api/client");
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    client1 = await response.json();
-  } catch (error) {
-    console.error("Error fetching client data:", error);
-  }
-}
-
 function displayClientData() {
   const clientDataDiv = document.getElementById("client-data");
   clientDataDiv.innerHTML = `
-        <div class="client-data-item"><strong>Name:</strong> ${client1.name}</div>
-        <div class="client-data-item"><strong>Surname:</strong> ${client1.surname}</div>
-        <div class="client-data-item"><strong>Age:</strong> ${client1.age}</div>
-        <div class="client-data-item"><strong>Location:</strong> ${client1.location}</div>
-        <div class="client-data-item"><strong>Issue:</strong> ${client1.issue}</div>
-    `;
+    <div class="client-data-item"><strong>Name:</strong> ${client1.name}</div>
+    <div class="client-data-item"><strong>Surname:</strong> ${client1.surname}</div>
+    <div class="client-data-item"><strong>Age:</strong> ${client1.age}</div>
+    <div class="client-data-item"><strong>Location:</strong> ${client1.location}</div>
+    <div class="client-data-item"><strong>Issue:</strong> ${client1.issue}</div>
+  `;
 }
 
 async function sendMessageToAI() {
@@ -57,26 +52,17 @@ async function sendMessageToAI() {
       },
       body: JSON.stringify({
         message: userMessage,
+        clientData: client1,
       }),
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
     const data = await response.json();
-
-    // Display the AI response
     responseDiv.innerHTML = `<p>${data.response.replace(/\n/g, "<br>")}</p>`;
-
-    // Update client data with response (if needed)
-    if (data.clientData) {
-      client1 = data.clientData;
-      displayClientData();
-    }
   } catch (error) {
     console.error("Error:", error);
-    responseDiv.innerHTML = `<p class="error">Error getting response: ${error.message}</p>`;
+    responseDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
   } finally {
     sendButton.disabled = false;
     sendButton.textContent = "Send to AI";
