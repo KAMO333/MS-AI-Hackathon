@@ -36,7 +36,7 @@ frontend/               # Client-side assets (HTML/CSS/JS)
 
 ## ✨ Key Features
 
-- **Senior-Level MVC Architecture:** Decoupled concerns for high maintainability and scalability.
+- **MVC Architecture:** Decoupled concerns for high maintainability and scalability.
 - **AI Consultation Engine:** Context-aware guidance powered by Groq (Llama-3-70b).
 - **Cloud-Native Storage:** Robust data persistence using Neon PostgreSQL.
 - **Automated Quality Assurance:** 100% mocked testing environment using Jest.
