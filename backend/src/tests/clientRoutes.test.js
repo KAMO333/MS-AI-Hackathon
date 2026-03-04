@@ -29,4 +29,16 @@ describe("API Endpoints", () => {
     const res = await request(app).get("/api/client");
     expect(res.statusCode).toEqual(200);
   });
+
+  it("POST /api/send-to-ai should fail if name is missing", async () => {
+    const res = await request(app)
+      .post("/api/send-to-ai")
+      .send({
+        message: "Help",
+        clientData: { surname: "Doe", issue: "Depression" }, // Missing 'name'
+      });
+
+    expect(res.statusCode).toEqual(400);
+    expect(res.body.error).toBeDefined();
+  });
 });
