@@ -129,3 +129,16 @@ button:disabled {
 .hidden {
   display: none;
 }
+
+.welcome-box {
+  text-align: center;
+  padding: 40px 20px;
+  color: #64748b;
+  border: 2px dashed var(--border);
+  border-radius: 8px;
+}
+
+.welcome-box h3 {
+  color: var(--primary);
+  margin-bottom: 10px;
+}

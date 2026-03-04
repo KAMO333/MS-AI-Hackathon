@@ -6,16 +6,11 @@ export const getLatestClient = async (req, res) => {
     const sql = `SELECT * FROM Clients ORDER BY created_at DESC LIMIT 1;`;
     const result = await query(sql);
 
+    // Senior tip: Return null or 404 if no records exist
     if (result.rows.length === 0) {
-      return res.json({
-        name: "New",
-        surname: "Client",
-        age: 0,
-        location: "None",
-        issue: "No history found",
-        response: null,
-      });
+      return res.status(404).json({ message: "No history found" });
     }
+
     res.json(result.rows[0]);
   } catch (error) {
     console.error("❌ Error fetching client:", error);

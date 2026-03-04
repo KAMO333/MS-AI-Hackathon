@@ -1,7 +1,6 @@
 let client1 = {};
 
 // Fetch and display client data on page load
-// Fetch and display client data on page load
 document.addEventListener("DOMContentLoaded", async function () {
   try {
     const response = await fetch("/api/client");
@@ -9,9 +8,12 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     const latestClient = await response.json();
 
-    // If we have data, fill the form and the "Saved" area
-    if (latestClient.id) {
+    // Check if we actually have a real record (ID 1 or higher)
+    if (latestClient && latestClient.id) {
       populateUI(latestClient);
+    } else {
+      // Handle "No Data" state: Keep form empty and show a welcome message
+      showWelcomeMessage();
     }
   } catch (error) {
     console.error("Error loading client data:", error);
@@ -21,6 +23,16 @@ document.addEventListener("DOMContentLoaded", async function () {
     .getElementById("send-button")
     .addEventListener("click", sendMessageToAI);
 });
+
+function showWelcomeMessage() {
+  const responseDiv = document.getElementById("ai-response");
+  responseDiv.innerHTML = `
+    <div class="welcome-box">
+      <h3>👋 Welcome to CareMind</h3>
+      <p>Start by entering client details above to generate a new AI-assisted consultation.</p>
+    </div>
+  `;
+}
 
 // New Helper function to update both the Form and the Saved Preview
 function populateUI(data) {
