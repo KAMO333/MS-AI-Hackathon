@@ -81,7 +81,7 @@ frontend/               # Client-side assets (HTML/CSS/JS)
 #### 1. Clone & Install
 
 ```bash
-git clone https://github.com/yourusername/CareMind.git
+git clone https://git@github.com:KAMO333/MS-AI-Hackathon.git
 cd CareMind/backend
 npm install
 ```
