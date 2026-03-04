@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -10,10 +10,42 @@
     <div class="container">
       <h1>Social Worker Assistant</h1>
 
-      <div class="client-info">
+      <section id="client-form-section">
         <h2>Client Information</h2>
-        <div id="client-data">
-          <!-- Client data will be populated by JavaScript -->
+        <form id="client-form">
+          <div class="form-group">
+            <input type="text" id="client-name" placeholder="Name" required />
+            <input
+              type="text"
+              id="client-surname"
+              placeholder="Surname"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <input type="number" id="client-age" placeholder="Age" required />
+            <input
+              type="text"
+              id="client-location"
+              placeholder="Location (e.g. Rosebank)"
+              required
+            />
+          </div>
+          <textarea
+            id="client-issue"
+            placeholder="Describe the primary issue..."
+            required
+          ></textarea>
+        </form>
+      </section>
+
+      <div id="saved-client-info" class="hidden">
+        <h3>💾 Last Saved Session</h3>
+        <div class="info-grid">
+          <p><strong>Database ID:</strong> <span id="db-id">-</span></p>
+          <p><strong>Full Name:</strong> <span id="db-name">-</span></p>
+          <p><strong>Location:</strong> <span id="db-location">-</span></p>
+          <p><strong>Age:</strong> <span id="db-age">-</span></p>
         </div>
       </div>
 
