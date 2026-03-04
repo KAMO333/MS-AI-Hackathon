@@ -1,112 +1,140 @@
-# Care Mind 🤝💬
+# CareMind 🤝💬
 
-A full-stack application that helps social workers manage client information and get AI-powered assistance, with proper client data integration.
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
+![Jest](https://img.shields.io/badge/Jest-C21325?style=for-the-badge&logo=jest&logoColor=white)
+![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white)
+![Groq](https://img.shields.io/badge/Groq-F55036?style=for-the-badge&logo=groq&logoColor=white)
 
-![Project Status](https://img.shields.io/badge/status-active-success)
-![Tech Stack](https://img.shields.io/badge/stack-HTML5%20%7C%20CSS3%20%7C%20JavaScript%20%7C%20Node.js%20%7C%20Express%20%7C%20OpenAI%20%7C%20MSSQL-blue)
+[![Node.js CI](https://github.com/KAMO333/MS-AI-Hackathon/actions/workflows/tests.yml/badge.svg)](https://github.com/KAMO333/MS-AI-Hackathon/actions/workflows/tests.yml)
 
+A professional full-stack application designed for social workers to manage client interactions with AI-powered clinical guidance. This project showcases a modern MVC (Model-View-Controller) architecture, cloud-native database integration, and automated testing.
+
+---
 
 ## 📁 Project Structure
 
+```text
+backend/
+├── src/
+│   ├── controllers/    # Route logic & orchestration
+│   ├── db/             # Database connection & pooling
+│   ├── middleware/     # Request validation guards
+│   ├── routes/         # API endpoint definitions
+│   ├── services/       # External AI API integration
+│   ├── tests/          # Jest unit & integration tests
+│   └── server.js       # Entry point
+frontend/               # Client-side assets (HTML/CSS/JS)
+.github/workflows/      # CI/CD (GitHub Actions)
+```
+
+---
+
 ## ✨ Key Features
 
-- 🧑‍💼 Complete client data integration with AI responses
-- 🤖 Intelligent context-aware suggestions
-- 💾 SQL database storage for all interactions
-- 🔄 Real-time AI responses with client context
-- 🛡️ Error handling and user feedback
+- **Senior-Level MVC Architecture:** Decoupled concerns for high maintainability and scalability.
+- **AI Consultation Engine:** Context-aware guidance powered by Groq (Llama-3-70b).
+- **Cloud-Native Storage:** Robust data persistence using Neon PostgreSQL.
+- **Automated Quality Assurance:** 100% mocked testing environment using Jest.
+- **CI/CD Pipeline:** Automated test execution on every push via GitHub Actions.
+- **Modern UI:** Professional "Digital Case File" aesthetic with real-time state feedback.
+
+---
 
 ## 🛠️ Technologies Used
 
-- **Backend**:
-  - Node.js 🟢
-  - Express.js 🚀
-  - OpenAI API 🧠 (GPT-3.5-turbo)
-  - MSSQL 🗃️
-  - CORS 🔄
-- **Frontend**:
-  - HTML5 📄
-  - CSS3 🎨
-  - JavaScript 🟨 (ES6)
+**Backend:**
+
+- Node.js (ES Modules)
+- Express.js
+- Groq SDK (Llama-3-70b-versatile)
+- PostgreSQL (pg) with Connection Pooling
+
+**Frontend:**
+
+- HTML5
+- Vanilla JS (Fetch API & DOM Manipulation)
+- CSS3 (Flexbox/Grid design system)
+
+**DevOps & Testing:**
+
+- Jest (Native ESM Testing)
+- GitHub Actions
+- Supertest (API Testing)
+
+---
 
 ## 🚀 Installation Guide
 
 ### Prerequisites
 
-- Node.js (v14+)
-- npm (v6+)
-- SQL Server instance
-- OpenAI API key
+- Node.js (v20+)
+- Neon.tech (or local PostgreSQL) account
+- Groq API Key
 
 ### Setup Instructions
 
-1. **Clone the repository**:
+#### 1. Clone & Install
 
-   ```bash
-   git clone https://github.com/yourusername/social-worker-assistant.git
-   cd social-worker-assistant
-   ```
+```bash
+git clone https://github.com/yourusername/CareMind.git
+cd CareMind/backend
+npm install
+```
 
-2. **Backend setup**:
+#### 2. Environment Configuration
 
-   ```bash
-   cd backend
-   npm install
-   ```
+Create a `.env` file in the `backend` folder:
 
-3. **Environment configuration**:
-   Create `.env` file in backend folder with:
+```env
+PORT=3000
+DATABASE_URL=postgres://user:password@hostname/dbname?sslmode=require
+GROQ_API_KEY=your_groq_key_here
+```
 
-   ```env
-   PORT=3000
-   DB_USER=your_db_username
-   DB_PASSWORD=your_db_password
-   DB_SERVER=your_server_address
-   DB_DATABASE=your_db_name
-   OPENAI_API_KEY=your_openai_key
-   ```
+#### 3. Database Migration
 
-4. **Database setup**:
-   Ensure your SQL Server has a table with this structure:
-   ```sql
-   CREATE TABLE Clients (
-     id INT IDENTITY(1,1) PRIMARY KEY,
-     name NVARCHAR(100),
-     surname NVARCHAR(100),
-     age INT,
-     location NVARCHAR(100),
-     issue NVARCHAR(255),
-     response NVARCHAR(MAX),
-     created_at DATETIME DEFAULT GETDATE()
-   )
-   ```
+Run this in your PostgreSQL console:
+
+```sql
+CREATE TABLE Clients (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    surname VARCHAR(255),
+    age INTEGER,
+    location VARCHAR(255),
+    issue TEXT,
+    response TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+---
+
+## 🧪 Running Tests
+
+This project uses Native ESM with Jest. Run the automated suite with:
+
+```bash
+npm test
+```
+
+---
 
 ## 🏃 Running the Application
 
-1. **Start the backend server**:
+#### 1. Start the Development Server
 
-   ```bash
-   cd backend
-   node src/server.js
-   ```
+```bash
+npm run dev
+```
 
-2. **Open in browser**:
-   http://localhost:3000
+#### 2. Access the UI
 
-## 🖥️ Usage Guide
+Open `http://localhost:3000` in your browser.
 
-1. **View Client Dashboard**:
-
-   - Automatically loads client information
-   - Displays name, age, location, and primary issue
-
-2. **Send Messages**:
-
-   - Type your message in the text area
-   - Click "Send to AI"
-   - Client context is automatically included
-
-3. **View Responses**:
-   - AI responses appear in the response section
-   - Formatted with proper line breaks
-   - Includes contextual advice based on client data
+---
